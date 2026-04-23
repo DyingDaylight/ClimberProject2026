@@ -7,7 +7,7 @@ public class TiersController : MonoBehaviour
     [SerializeField] Camera camera;
     [SerializeField] int tierHeight = 1; // Assumes the tier pivot is at its center
     
-    private List<GameObject> Tiers = new List<GameObject>();
+    private List<GameObject> tiers = new List<GameObject>();
     private float nextSpawnY = 0;
     
     void Start()
@@ -24,7 +24,7 @@ public class TiersController : MonoBehaviour
 
     void Update()
     {
-        if (Tiers.Count == 0)
+        if (tiers.Count == 0)
         {
             Debug.Log("TiersController: no tiers found");
             return;    
@@ -32,20 +32,18 @@ public class TiersController : MonoBehaviour
         
         // if the top of the camera enters the current top tier, spawn the next one
         float upperEdge = camera.transform.position.y + camera.orthographicSize;
-        float lastTierLowerEdge = Tiers[^1].transform.position.y - tierHeight / 2f;
+        float lastTierLowerEdge = tiers[^1].transform.position.y - tierHeight / 2f;
         while (upperEdge >= lastTierLowerEdge)
         {
             SpawnTier();
-            lastTierLowerEdge = Tiers[^1].transform.position.y - tierHeight / 2f;
+            lastTierLowerEdge = tiers[^1].transform.position.y - tierHeight / 2f;
         }
 
         // if the bottom tier is completely below the visible area, remove it
         float lowerEdge = camera.transform.position.y - camera.orthographicSize;
-        float bottomTierUpperEdge = Tiers[0].transform.position.y + tierHeight / 2f;
-        while (Tiers.Count > 0 && lowerEdge > bottomTierUpperEdge)
+        while (tiers.Count > 0 && lowerEdge > tiers[0].transform.position.y + tierHeight / 2f)
         {
             RemoveBottomTier();
-            bottomTierUpperEdge = Tiers[0].transform.position.y + tierHeight / 2f;
         }
     }
 
@@ -53,14 +51,37 @@ public class TiersController : MonoBehaviour
     {
         // spawn at nextSpawnY, then advance spawn position for the following tier
         GameObject newTier = Instantiate(tierPrefab, new Vector3(0, nextSpawnY, 0), Quaternion.identity, transform);
-        Tiers.Add(newTier);
+        tiers.Add(newTier);
         nextSpawnY += tierHeight;
     }
 
     private void RemoveBottomTier()
     {
-        GameObject bottomTier = Tiers[0];
-        Tiers.RemoveAt(0);
+        GameObject bottomTier = tiers[0];
+        tiers.RemoveAt(0);
         Destroy(bottomTier);
+    }
+    
+    private void OnEnable()
+    {
+        WorldShiftController.OnWorldShift += HandleWorldShift;
+    }
+
+    private void OnDisable()
+    {
+        WorldShiftController.OnWorldShift -= HandleWorldShift;
+    }
+
+    private void HandleWorldShift(float deltaY)
+    {
+        if (tiers.Count == 0)
+            return;
+        
+        foreach (GameObject tier in tiers)
+        {
+            tier.transform.position = new Vector3(tier.transform.position.x, 
+                tier.transform.position.y + deltaY, tier.transform.position.z);
+        }
+        nextSpawnY = tiers[^1].transform.position.y + tierHeight;
     }
 }
