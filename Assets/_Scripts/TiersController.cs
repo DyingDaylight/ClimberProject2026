@@ -9,12 +9,17 @@ public class TiersController : MonoBehaviour
     
     private List<GameObject> tiers = new List<GameObject>();
     private float nextSpawnY = 0;
+    private float visibleHeight;
     
     void Start()
     {
-        nextSpawnY = camera.transform.position.y - camera.orthographicSize - tierHeight;
+        
+        float distance = Mathf.Abs(camera.transform.position.z - transform.position.z);
+        visibleHeight = 2f * distance * Mathf.Tan(camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        
+        nextSpawnY = camera.transform.position.y - visibleHeight * 0.5f - tierHeight;
         int offsetTiers = 2;
-        int initialTiersCount = (int) Mathf.Ceil(camera.orthographicSize * 2 / tierHeight) + offsetTiers;
+        int initialTiersCount = (int) Mathf.CeilToInt(visibleHeight / tierHeight) + offsetTiers;
         
         for (int i = 0; i < initialTiersCount; i++)
         {
@@ -31,7 +36,7 @@ public class TiersController : MonoBehaviour
         }
         
         // if the top of the camera enters the current top tier, spawn the next one
-        float upperEdge = camera.transform.position.y + camera.orthographicSize;
+        float upperEdge = camera.transform.position.y + visibleHeight * 0.5f;
         float lastTierLowerEdge = tiers[^1].transform.position.y - tierHeight / 2f;
         while (upperEdge >= lastTierLowerEdge)
         {
@@ -40,7 +45,7 @@ public class TiersController : MonoBehaviour
         }
 
         // if the bottom tier is completely below the visible area, remove it
-        float lowerEdge = camera.transform.position.y - camera.orthographicSize;
+        float lowerEdge = camera.transform.position.y - visibleHeight * 0.5f;
         while (tiers.Count > 0 && lowerEdge > tiers[0].transform.position.y + tierHeight / 2f)
         {
             RemoveBottomTier();
