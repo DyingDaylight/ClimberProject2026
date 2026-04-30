@@ -174,7 +174,6 @@ GameObject:
   m_Component:
   - component: {fileID: 189223867}
   - component: {fileID: 189223868}
-  - component: {fileID: 189223869}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -206,27 +205,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 189223866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 876c5b8bbaef4d4ab0c7190c03492a3b, type: 3}
+  m_Script: {fileID: 11500000, guid: 430ed4ea85f2e2440a9e0bb7ac7e8ab0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AdvancedTowerGenerator
+  m_EditorClassIdentifier: '::'
   tierPrefab: {fileID: 2371139645042135075, guid: 4513d75467e99944b91ad3d589d828c9, type: 3}
-  mainCamera: {fileID: 330585545}
-  tierHeight: 1
-  taggedObjectPooler: {fileID: 1972909451}
---- !u!114 &189223869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 189223866}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6a64b0813b54e8fa80691fa1566b912, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleTowerGenerator
-  tierPrefab: {fileID: 2371139645042135075, guid: 4513d75467e99944b91ad3d589d828c9, type: 3}
-  mainCamera: {fileID: 330585545}
+  camera: {fileID: 330585545}
   tierHeight: 1
   taggedObjectPooler: {fileID: 1972909451}
 --- !u!1001 &227856450
@@ -1244,51 +1227,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   cameraTransform: {fileID: 330585546}
   parallaxFactor: 0.01
---- !u!1 &1463090331
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1463090333}
-  - component: {fileID: 1463090332}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1463090332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463090331}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47ae341f6568e714390d83a027cbea41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  levelParameters: {fileID: 11400000, guid: 5e1a9eae9d495274ca66f1e004045fb9, type: 2}
---- !u!4 &1463090333
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463090331}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1483773369
 GameObject:
   m_ObjectHideFlags: 0
@@ -1333,7 +1271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44de2b43087d3eb49b1ded6f7ffcf9d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  maxPlayerDistance: 10
+  maxPlayerDistance: 20
   shiftTargetY: 0
 --- !u!1 &1954922216
 GameObject:
@@ -1476,7 +1414,7 @@ MonoBehaviour:
   pools:
   - tag: Stairs
     prefab: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
-    initialPoolSize: 240
+    initialPoolSize: 20
   - tag: Tier
     prefab: {fileID: 2371139645042135075, guid: 4513d75467e99944b91ad3d589d828c9, type: 3}
     initialPoolSize: 20
@@ -1523,4 +1461,3 @@ SceneRoots:
   - {fileID: 460915829}
   - {fileID: 1954922219}
   - {fileID: 2017986495}
-  - {fileID: 1463090333}

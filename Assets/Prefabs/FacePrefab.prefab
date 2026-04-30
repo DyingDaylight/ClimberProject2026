@@ -73,6 +73,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5336259458085005304}
+  - component: {fileID: 2491502125521054609}
   m_Layer: 0
   m_Name: FacePrefab
   m_TagString: Untagged
@@ -98,6 +99,22 @@ Transform:
   - {fileID: 90845328706036316}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2491502125521054609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8466568564663670069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3755b23717b02b846892ffda7ac2a145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  slots:
+  - {fileID: 3587074927294475779}
+  - {fileID: 5092181356456978405}
+  - {fileID: 90845328706036316}
 --- !u!1 &8852230255522918135
 GameObject:
   m_ObjectHideFlags: 0
@@ -141,6 +158,10 @@ PrefabInstance:
     - target: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
       propertyPath: m_Name
       value: StairsPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5337704693874643739, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
       propertyPath: m_LocalPosition.x
@@ -204,6 +225,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StairsPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5337704693874643739, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -265,6 +290,10 @@ PrefabInstance:
     - target: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
       propertyPath: m_Name
       value: StairsPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5337704693874643739, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
       propertyPath: m_LocalPosition.x
