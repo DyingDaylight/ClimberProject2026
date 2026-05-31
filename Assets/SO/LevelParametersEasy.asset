@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c2c283272a49a8b243a64235f48024, type: 3}
+  m_Name: LevelParametersEasy
+  m_EditorClassIdentifier: Assembly-CSharp::LevelParameters
+  minLadder: 1
+  maxLadder: 3
+  tierMaterial: {fileID: 2100000, guid: 3e679a2e8fd2a5d4bae0f8ebfbd2198c, type: 2}

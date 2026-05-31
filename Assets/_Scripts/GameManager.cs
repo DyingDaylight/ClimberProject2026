@@ -1,8 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-    [SerializeField] private LevelParameters levelParameters;
-
-    public LevelParameters LevelParameters => levelParameters;
+    // TODO: find out why do I need GameManager
 }

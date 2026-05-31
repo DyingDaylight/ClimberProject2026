@@ -4,20 +4,21 @@ using UnityEngine;
 
 public abstract class BaseTowerGenerator : MonoBehaviour
 {
-    [SerializeField] private GameObject tierPrefab;
+    
     [SerializeField] private Camera mainCamera;
     [SerializeField] protected int tierHeight = 1; // Assumes the tier pivot is at its center
-    [SerializeField] protected TaggedObjectPooler taggedObjectPooler;
+    
     protected List<GameObject> tiers = new List<GameObject>();
     protected float nextSpawnY = 0;
-    private float visibleHeight;
+    
+    private float drawHeight;
 
     private void Start()
     {
         float distance = Mathf.Abs(this.mainCamera.transform.position.z - transform.position.z);
-        visibleHeight = 2f * distance * Mathf.Tan(this.mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        drawHeight = 2f * distance * Mathf.Tan(this.mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
     
-        nextSpawnY = this.mainCamera.transform.position.y - visibleHeight * 0.5f - tierHeight;
+        nextSpawnY = mainCamera.transform.position.y - drawHeight * 0.5f - tierHeight;
     }
 
     private void Update()
@@ -29,7 +30,7 @@ public abstract class BaseTowerGenerator : MonoBehaviour
         }
     
         // if the top of the camera enters the current top tier, spawn the next one
-        float upperEdge = this.mainCamera.transform.position.y + visibleHeight * 0.5f;
+        float upperEdge = this.mainCamera.transform.position.y + drawHeight * 0.5f;
         float lastTierLowerEdge = tiers[^1].transform.position.y - tierHeight / 2f;
         while (upperEdge >= lastTierLowerEdge)
         {
@@ -38,7 +39,7 @@ public abstract class BaseTowerGenerator : MonoBehaviour
         }
 
         // if the bottom tier is completely below the visible area, remove it
-        float lowerEdge = this.mainCamera.transform.position.y - visibleHeight * 0.5f;
+        float lowerEdge = this.mainCamera.transform.position.y - drawHeight * 0.5f;
         while (tiers.Count > 0 && lowerEdge > tiers[0].transform.position.y + tierHeight / 2f)
         {
             RemoveBottomTier();
@@ -48,7 +49,7 @@ public abstract class BaseTowerGenerator : MonoBehaviour
     private void InitializeTower()
     {
         int offsetTiers = 2;
-        int initialTiersCount = (int) Mathf.CeilToInt(visibleHeight / tierHeight) + offsetTiers;
+        int initialTiersCount = (int) Mathf.CeilToInt(drawHeight / tierHeight) + offsetTiers;
     
         for (int i = 0; i < initialTiersCount; i++)
         {
@@ -60,12 +61,16 @@ public abstract class BaseTowerGenerator : MonoBehaviour
 
     private void RemoveBottomTier()
     {
+        if (tiers.Count == 1)
+            return;
+        
         GameObject bottomTier = tiers[0];
-        TierController tier = bottomTier.GetComponent<TierController>();
-        tier.ClearObjects();
+        TierPopulator tier = bottomTier.GetComponent<TierPopulator>();
+        if (tier)
+            tier.ClearObjects();
     
         tiers.RemoveAt(0);
-        taggedObjectPooler.ReturnObject(bottomTier, bottomTier.tag);
+        TaggedObjectPooler.Instance.ReturnObject(bottomTier, bottomTier.tag);
     }
 
     private void OnEnable()

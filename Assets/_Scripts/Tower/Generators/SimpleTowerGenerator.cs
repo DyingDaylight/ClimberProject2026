@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class SimpleTowerGenerator : BaseTowerGenerator
 {
+    [SerializeField] private GameObject tierPrefab;
+    
     protected override void SpawnTier()
     {
         // spawn at nextSpawnY, then advance spawn position for the following tier
@@ -11,7 +13,7 @@ public class SimpleTowerGenerator : BaseTowerGenerator
         newTier.transform.position = new Vector3(0, nextSpawnY, 0);
         newTier.transform.rotation = Quaternion.identity;
         
-        GameObject stairs =  taggedObjectPooler.GetPooledObject("Stairs");
+        GameObject stairs =  TaggedObjectPooler.Instance.GetPooledObject("Stairs");
         Transform slot = newTier.transform.Find("FaceBack/Zone_0");
     
         stairs.transform.SetParent(slot, false);

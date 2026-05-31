@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c2c283272a49a8b243a64235f48024, type: 3}
   m_Name: LevelParameters
   m_EditorClassIdentifier: Assembly-CSharp::LevelParameters
-  stairsChance: 0.5
+  minLadder: 1
+  maxLadder: 1
+  tierMaterial: {fileID: 0}
