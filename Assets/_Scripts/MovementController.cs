@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using _Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,37 +8,41 @@ using UnityEngine.InputSystem;
 public class MovementController : MonoBehaviour
 {
     [Header("Movement Speed")]
-    [SerializeField] float horizontalSpeed = 5f;
-    [SerializeField] float verticalSpeed = 4f;
+    [SerializeField] private float horizontalSpeed = 1f;
+    [SerializeField] private float verticalSpeed = 1f;
 
-    [Header("Boundary Checking")] [SerializeField]
-    private float boundaryBuffer = 0.01f;
+    [Header("Colliders")]
+    [SerializeField] private Collider footCollider;
+    [SerializeField] private float platformSnapOffset = 0.01f;
 
     private Vector2 MovementInput { get; set; } = Vector2.zero;
-
     private MovementMode movementMode = MovementMode.Platform;
 
-    private bool isOnPlatform = true;
-    private bool isOnLadder = false;
-
-    private Vector3 ladderCenter;
-
-    private Collider playerCollider;
     private Collider currentPlatform;
-    private Bounds platformBounds;
+    private HashSet<Collider> ladders = new HashSet<Collider>();
     
     private InputSystem_Actions inputActions;
-
+    
+    private float halfHeight = -1;
+    
+    private bool HasPlatform => currentPlatform != null;
+    
+    
     private void Awake()
     {
-        playerCollider = GetComponent<Collider>();
-        movementMode = MovementMode.Platform;
         InitializePlayerInput();
     }
 
     private void Update()
     {
         ApplyMovement();
+    }
+    
+    private void FixedUpdate()
+    {
+        // Count hight of the player and save it for later use in updates
+        if (halfHeight < 0)
+            halfHeight = transform.position.y - footCollider.bounds.min.y;
     }
 
     private void OnDestroy()
@@ -59,87 +65,91 @@ public class MovementController : MonoBehaviour
 
     private void ApplyMovement()
     {
-        Vector3 movementVector = Vector3.zero;
         float horizontal = Mathf.Clamp(MovementInput.x, -1, 1);
         float vertical = Mathf.Clamp(MovementInput.y, -1, 1);
 
-        if (movementMode == MovementMode.Platform)
-        {
-            movementVector.x = horizontal * horizontalSpeed;
+        Vector3 position = transform.position;
 
-            if (isOnLadder && Mathf.Abs(vertical) > 0.01f)
-            {
-                EnterLadderMode();
-            }
-        } 
-        else if (movementMode == MovementMode.Ladder)
+        switch (movementMode)
         {
-            if (!isOnLadder)
-            {
-                ExitLadderMode();
-                return;
-            }
+            case MovementMode.Platform:
+                position = MoveOnPlatform(position, horizontal, vertical);
+                break;
 
-            if (Mathf.Abs(horizontal) > 0.01f && isOnPlatform)
-            {
-                ExitLadderMode();
-                movementVector.x = horizontal *  horizontalSpeed;
-            }
-            else
-            {
-                Vector3 position = transform.position;
-                position.x = ladderCenter.x;
-                transform.position = position;
-                movementVector.y = vertical * verticalSpeed;
-            }
+            case MovementMode.Ladder:
+                position = MoveOnLadder(position, horizontal, vertical);
+                break;
         }
-        
-        Vector3 newPosition = transform.position + movementVector * Time.deltaTime;
 
-        if (currentPlatform != null && movementMode == MovementMode.Platform)
-        {
-            newPosition = ClampToPlatformBounds(newPosition);
-        }
-        
-        transform.position = newPosition;
+        transform.position = position;
     }
 
-    private Vector3 ClampToPlatformBounds(Vector3 position)
+    private Vector3 MoveOnPlatform(Vector3 position, float horizontal, float vertical)
     {
-        if (playerCollider == null) return position;
+        if (currentPlatform == null)
+            return position;
         
-        float playerHalfWidth = playerCollider.bounds.size.x * 0.5f;
-        float leftBound = platformBounds.min.x + playerHalfWidth;
-        float rightBound = platformBounds.max.x - playerHalfWidth;
+        position.x += horizontal * horizontalSpeed * Time.deltaTime;
+        position = ClampToPlatformX(position);
+        position = SnapToPlatformY(position);
         
-        position.x = Mathf.Clamp(position.x, leftBound, rightBound);
-        position.y = platformBounds.min.y + playerCollider.bounds.size.y;
+        if (Mathf.Abs(vertical) > platformSnapOffset)
+        {
+            if (ladders.Count > 0)
+            {
+                movementMode = MovementMode.Ladder;
+            }
+        }
+
+        return position;
+    }
+    
+    private Vector3 MoveOnLadder(Vector3 position, float horizontal, float vertical)
+    {
+        if (Mathf.Abs(horizontal) > platformSnapOffset && currentPlatform)
+        {
+            movementMode = MovementMode.Platform;
+
+            position.x += horizontal * horizontalSpeed * Time.deltaTime;
+            position = SnapToPlatformY(position);
+            position = ClampToPlatformX(position);
+            
+            return position;
+        }
+        
+        if (ladders.Count == 0)
+            return position;
+        
+        position.x = ladders.First().transform.position.x;
+        position.y += vertical * verticalSpeed * Time.deltaTime;
         
         return position;
     }
 
-    private void EnterLadderMode()
+    private Vector3 SnapToPlatformY(Vector3 position)
     {
-        isOnLadder = true;
-        movementMode = MovementMode.Ladder;
+        if (!HasPlatform || footCollider == null || halfHeight < 0)
+            return position;
+
+        position.y = currentPlatform.bounds.max.y + halfHeight - platformSnapOffset;
         
-        Vector3 position = transform.position;
-        position.x = ladderCenter.x;
-        transform.position = position;
-        
-        Debug.Log("Entered ladder mode");
+        return position;
     }
 
-    private void ExitLadderMode()
+    private Vector3 ClampToPlatformX(Vector3 position)
     {
-        isOnLadder = false;
-        movementMode = MovementMode.Platform;
+        if (!HasPlatform || footCollider == null) 
+            return position;
         
-        Vector3 position = transform.position;
-        position.y = platformBounds.max.y + playerCollider.bounds.size.y;
-        transform.position = position;
+        Bounds platformBounds = currentPlatform.bounds;
         
-        Debug.Log("Exited ladder mode");
+        float playerHalfWidth = footCollider.bounds.size.x * 0.5f;
+        float leftBound = platformBounds.min.x + playerHalfWidth;
+        float rightBound = platformBounds.max.x - playerHalfWidth;
+        
+        position.x = Mathf.Clamp(position.x, leftBound, rightBound);
+        
+        return position;
     }
     
     private void OnEnable()
@@ -157,37 +167,30 @@ public class MovementController : MonoBehaviour
         transform.position = new Vector3(transform.position.x, 
             transform.position.y + deltaY, transform.position.z);
     }
-    
-    public void MoveUp() 
-    {
-        transform.position += Vector3.up;   
-    }
 
-    private void OnTriggerEnter(Collider other)
+    public void OnChildTriggerEnter(PlayerColliderType colliderType, Collider other)
     {
-        if (other.CompareTag("Stairs"))
+        if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
-            ladderCenter = other.bounds.center;
-            EnterLadderMode();
-        }
-        else if (other.CompareTag("Platform"))
-        {
-            isOnPlatform = true;
             currentPlatform = other;
-            platformBounds = other.bounds;
+        }
+        
+        if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
+        {
+            ladders.Add(other);
         }
     }
-
-    private void OnTriggerExit(Collider other)
+    
+    public void OnChildTriggerExit(PlayerColliderType colliderType, Collider other)
     {
-        if (other.CompareTag("Stairs"))
+        if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
-            ExitLadderMode();
+            currentPlatform = null;
         }
-        else if (other.CompareTag("Platform"))
+        
+        if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
         {
-            isOnPlatform = false;
-            if (currentPlatform == other) currentPlatform = null;
+            ladders.Remove(other);
         }
     }
 }
