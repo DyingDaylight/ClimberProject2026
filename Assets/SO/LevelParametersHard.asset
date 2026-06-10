@@ -15,3 +15,6 @@ MonoBehaviour:
   minLadder: 1
   maxLadder: 2
   tierMaterial: {fileID: 2100000, guid: ff61c1c970e69ee4db6fb44e775501dd, type: 2}
+  collectableSpawnChance: 0.3
+  collectables:
+  - {fileID: 11400000, guid: c90b08b952718874597650a4be1f228f, type: 2}

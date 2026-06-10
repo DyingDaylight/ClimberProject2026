@@ -13,6 +13,7 @@ namespace _Scripts.Poolers
             public int initialPoolSize = 10;  // Initial number of objects in the pool.
         }
 
+        public int defaultPoolSize = 240;
         public List<Pool> pools;  // A list of different pools.
 
         private Dictionary<string, Queue<GameObject>> pooledObjects;  // A dictionary to hold pooled objects by tags.
@@ -60,6 +61,44 @@ namespace _Scripts.Poolers
             if (obj != null && pooledObjects.ContainsKey(tag))
             {
                 obj.SetActive(false);  // Deactivate the object when returned to pool.
+                pooledObjects[tag].Enqueue(obj);
+            }
+        }
+        
+        public GameObject GetPooledObject(string tag, GameObject prefab = null)
+        {
+            if (!pooledObjects.ContainsKey(tag) && prefab != null)
+            {
+                CreatePool(tag, prefab);
+            }
+            
+            if (pooledObjects.ContainsKey(tag) && pooledObjects[tag].Count > 0)
+            {
+                GameObject obj = pooledObjects[tag].Dequeue();
+                obj.SetActive(true);  // Activate the object when retrieved.
+                return obj;
+            }
+    
+            // If no objects are available, instantiate a new one.
+            Pool pool = pools.Find(p => p.tag == tag);
+            if (pool != null)
+            {
+                GameObject newObj = Instantiate(pool.prefab);
+                return newObj;
+            }
+
+            Debug.LogWarning($"No pool found for tag: {tag}");
+            return null;
+        }
+
+        private void CreatePool(string tag, GameObject prefab)
+        {
+            pooledObjects[tag] = new Queue<GameObject>();
+
+            for (int i = 0; i < defaultPoolSize; i++)
+            {
+                GameObject obj = Instantiate(prefab);
+                obj.SetActive(false);  // Deactivate initially to save resources.
                 pooledObjects[tag].Enqueue(obj);
             }
         }

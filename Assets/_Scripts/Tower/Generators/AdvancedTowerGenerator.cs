@@ -6,6 +6,22 @@ using _Scripts.Poolers;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public class SaveGameInfo
+{
+    public List<SegmentSaveInfo> segments;
+    public float playerX;
+    public float playerY;
+}
+
+public class SegmentSaveInfo
+{
+    public float posX;
+    public float posY;
+    public float posZ;
+    public bool[] slots;
+    
+}
+
 public class AdvancedTowerGenerator : BaseTowerGenerator
 {
     [Header("Difficulty Management")]
@@ -52,14 +68,16 @@ public class AdvancedTowerGenerator : BaseTowerGenerator
         TierPopulator populator = newTier.GetComponent<TierPopulator>();
         if (populator != null)
         {
-            populator.AddLaddersToFace(0, FindSlotsForLadders(0));
+            // TODO: fix bug with snapping to the ladders from different face
+            for (int face = 0; face < 1; face++)
+                populator.AddLaddersToFace(face, FindSlotsForLadders(face), 
+                    towerManager.CurrentTierParameters);
         }
 
         if (towerManager != null && towerManager.IncrementTiers())
         {
             OnDifficultyChanged?.Invoke(towerManager.CurrentLevelName);
         }
-        
     }
     
     private LevelParameters GetCurrentLevelParameters()

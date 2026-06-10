@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace _Scripts.Parameters
 {
@@ -10,6 +11,10 @@ namespace _Scripts.Parameters
         [Range(1, 3)]
         public int maxLadder;
         public Material tierMaterial;
+
+        [Header("Collectables")]
+        public float collectableSpawnChance;
+        public List<Collectable> collectables;
     }
 }
 

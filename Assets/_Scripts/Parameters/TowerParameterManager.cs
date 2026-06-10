@@ -32,7 +32,6 @@ namespace _Scripts.Parameters
 
         public bool IncrementTiers()
         {
-            Debug.Log("IncrementTiers" + currentLevelIndex);
             if (CurrentLevelParameters == null) return false;
         
             tiersGenerated++;
@@ -45,12 +44,10 @@ namespace _Scripts.Parameters
 
         public bool AdvanceToNextLevel()
         {
-            Debug.Log("AdvanceToNextLevel " + currentLevelIndex);
             if (currentLevelIndex + 1 < levelParameters.Count)
             {
                 currentLevelIndex++;
                 tiersGenerated = 0;
-                Debug.Log($"Difficulty advanced to: {CurrentLevelName}");
                 return true;
             }    
         

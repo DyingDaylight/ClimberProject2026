@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: LevelParameters
   m_EditorClassIdentifier: Assembly-CSharp::LevelParameters
   minLadder: 1
-  maxLadder: 1
+  maxLadder: 2
   tierMaterial: {fileID: 0}
+  collectables:
+  - {fileID: 11400000, guid: c90b08b952718874597650a4be1f228f, type: 2}

@@ -7,6 +7,8 @@ TagManager:
   - Tier
   - Stairs
   - Platform
+  - Apple
+  - Coin
   layers:
   - Default
   - TransparentFX

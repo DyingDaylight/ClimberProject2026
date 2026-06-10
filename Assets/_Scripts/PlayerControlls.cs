@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -188,6 +189,13 @@ public class PlayerControl : MonoBehaviour
             isOnPlatform = true;
             currentPlatform = other;
             platformBounds = other.bounds;
+        } else if (other.gameObject.CompareTag("Collectable"))
+        {
+            other.TryGetComponent(out ICollectable collectable);
+            if (collectable != null)
+            {
+                collectable.OnCollect();
+            }
         }
 
     }
