@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5337704693874643739}
   - component: {fileID: 5180457830860883651}
+  - component: {fileID: 1365149629465330748}
   m_Layer: 0
-  m_Name: StairsPrefab
+  m_Name: LadderPrefab
   m_TagString: Stairs
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,6 +55,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.6, z: 0.25}
   m_Center: {x: 0, y: -0.25, z: 0}
+--- !u!114 &1365149629465330748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2208506284101802191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c26a63976fa49ffba01044bf11cd817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Poolable
+  poolTag: Ladder
 --- !u!1001 &2091070357222360423
 PrefabInstance:
   m_ObjectHideFlags: 0

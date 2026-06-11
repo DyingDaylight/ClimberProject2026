@@ -69,7 +69,7 @@ public class AdvancedTowerGenerator : BaseTowerGenerator
         if (populator != null)
         {
             // TODO: fix bug with snapping to the ladders from different face
-            for (int face = 0; face < 1; face++)
+            for (int face = 0; face < 4; face++)
                 populator.AddLaddersToFace(face, FindSlotsForLadders(face), 
                     towerManager.CurrentTierParameters);
         }

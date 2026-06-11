@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2147839684273307877}
   - component: {fileID: 9111843288975030005}
   - component: {fileID: -2346718272457436528}
+  - component: {fileID: 2865991312302227579}
   m_Layer: 0
   m_Name: Coin
   m_TagString: Coin
@@ -72,6 +73,19 @@ CapsuleCollider:
   m_Height: 0
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2865991312302227579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8351180956726023121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c26a63976fa49ffba01044bf11cd817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Poolable
+  poolTag: Coin
 --- !u!1001 &8037104370994173762
 PrefabInstance:
   m_ObjectHideFlags: 0

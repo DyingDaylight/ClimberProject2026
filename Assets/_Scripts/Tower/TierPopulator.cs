@@ -6,7 +6,7 @@ using UnityEngine;
 public class TierPopulator : MonoBehaviour
 {
     [SerializeField] private FaceController[] faces;
-    private List<GameObject> objects = new List<GameObject>();
+    private List<Poolable> poolableObjects = new List<Poolable>();
     
     public void AddLaddersToFace(int faceIndex, bool[] ladderSlots, TierParameters tierParameters)
     {
@@ -20,17 +20,21 @@ public class TierPopulator : MonoBehaviour
             if (!ladderSlots[i])
                 continue;
             
-            GameObject stairs = TaggedObjectPooler.Instance.GetPooledObject("Stairs");
+            GameObject ladder = TaggedObjectPooler.Instance.GetPooledObject("Ladder");
             
             Transform slot = i < 3 ? face.GetUpperSlot(i) : face.GetLowerSlot(i % 3);
             
-            stairs.transform.SetParent(slot, false);
-            stairs.transform.localPosition  = Vector3.zero;
-            stairs.transform.localRotation = Quaternion.identity;
-            stairs.transform.localScale = Vector3.one;
+            ladder.transform.SetParent(slot, false);
+            ladder.transform.localPosition  = Vector3.zero;
+            ladder.transform.localRotation = Quaternion.identity;
+            ladder.transform.localScale = Vector3.one;
             
             
-            objects.Add(stairs);
+            Poolable poolable = ladder.GetComponentInChildren<Poolable>();
+            if (poolable == null)
+                Debug.LogError("Ladder is not poolable");
+            else
+                poolableObjects.Add(poolable);
 
             if (i < 3)
                 TrySpawnCollectables(slot, tierParameters);
@@ -54,19 +58,22 @@ public class TierPopulator : MonoBehaviour
             collectable.transform.rotation = Quaternion.identity;
             collectable.transform.localScale = Vector3.one;
             
-            objects.Add(collectable);
+            Poolable poolable = collectable.GetComponentInChildren<Poolable>();
+            if (poolable == null)
+                Debug.LogError("Collectable is not poolable");
+            else
+                poolableObjects.Add(poolable);
         }
     }
 
     public void ClearObjects()
     {
-        foreach (GameObject obj in objects)
+        foreach (Poolable obj in poolableObjects)
         {
-            obj.transform.SetParent(null); 
-            TaggedObjectPooler.Instance.ReturnObject(obj, obj.tag);
+            obj.ReturnToPool();
         }
         
-        objects.Clear();
+        poolableObjects.Clear();
     }
     
     private Collectable PickWeighted(List<Collectable> collectables)

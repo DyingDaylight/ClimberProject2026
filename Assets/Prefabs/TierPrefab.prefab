@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2436901430331442473}
   - component: {fileID: 4916996107353836532}
   - component: {fileID: 7985703455128548036}
+  - component: {fileID: -178058144791557961}
   m_Layer: 0
   m_Name: TierPrefab
   m_TagString: Tier
@@ -138,6 +139,19 @@ MonoBehaviour:
   - {fileID: 7079338442104125836}
   - {fileID: 1835235548889399088}
   - {fileID: 114294913038214881}
+--- !u!114 &-178058144791557961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2371139645042135075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c26a63976fa49ffba01044bf11cd817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Poolable
+  poolTag: Tier
 --- !u!1001 &28912547087177522
 PrefabInstance:
   m_ObjectHideFlags: 0

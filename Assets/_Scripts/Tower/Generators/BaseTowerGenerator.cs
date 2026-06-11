@@ -70,7 +70,8 @@ public abstract class BaseTowerGenerator : MonoBehaviour
             tier.ClearObjects();
     
         tiers.RemoveAt(0);
-        TaggedObjectPooler.Instance.ReturnObject(bottomTier, bottomTier.tag);
+        Poolable poolable = bottomTier.GetComponent<Poolable>();
+        if (poolable) poolable.ReturnToPool();
     }
 
     private void OnEnable()

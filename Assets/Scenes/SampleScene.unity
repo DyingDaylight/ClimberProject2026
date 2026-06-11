@@ -1256,7 +1256,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.26
-  m_Height: 1.78
+  m_Height: 1.2
   m_Direction: 2
   m_Center: {x: 0, y: 0.36, z: 0}
 --- !u!114 &1414966907
@@ -1617,7 +1617,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TaggedObjectPooler
   defaultPoolSize: 240
   pools:
-  - tag: Stairs
+  - tag: Ladder
     prefab: {fileID: 2208506284101802191, guid: 099e70e932347254a8bf3c176acd5a56, type: 3}
     initialPoolSize: 240
   - tag: Tier

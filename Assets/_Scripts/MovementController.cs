@@ -20,6 +20,7 @@ public class MovementController : MonoBehaviour
 
     private Collider currentPlatform;
     private HashSet<Collider> ladders = new HashSet<Collider>();
+    private float laddersX;
     
     private InputSystem_Actions inputActions;
     
@@ -120,7 +121,7 @@ public class MovementController : MonoBehaviour
         if (ladders.Count == 0)
             return position;
         
-        position.x = ladders.First().transform.position.x;
+        position.x = laddersX;
         position.y += vertical * verticalSpeed * Time.deltaTime;
         
         return position;
@@ -178,6 +179,8 @@ public class MovementController : MonoBehaviour
         if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
         {
             ladders.Add(other);
+            // TODO: work on it
+            laddersX = other.transform.position.x;
         }
     }
     
@@ -192,5 +195,15 @@ public class MovementController : MonoBehaviour
         {
             ladders.Remove(other);
         }
+    }
+    
+    private bool IsLadderOnCurrentFace(Collider ladder)
+    {
+        Vector3 toPlayer = (transform.position - transform.position).normalized;
+        Vector3 toLadder = (transform.position - ladder.transform.position).normalized;
+
+        float dot = Vector3.Dot(toPlayer, toLadder);
+
+        return dot > 0.7f;
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7975428200144235386}
   - component: {fileID: 7612816626149645319}
   - component: {fileID: -2422270709477918081}
+  - component: {fileID: -1004976976949221735}
   m_Layer: 0
   m_Name: Apple
   m_TagString: Apple
@@ -72,6 +73,19 @@ CapsuleCollider:
   m_Height: 0.17
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-1004976976949221735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9190430402045627829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c26a63976fa49ffba01044bf11cd817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Poolable
+  poolTag: Apple
 --- !u!1001 &8214130974206412333
 PrefabInstance:
   m_ObjectHideFlags: 0
