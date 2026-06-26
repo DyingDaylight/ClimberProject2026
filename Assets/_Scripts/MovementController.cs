@@ -59,11 +59,13 @@ public class MovementController : MonoBehaviour
         inputActions.Enable();
     }
 
-    private void OnMoveInput(InputAction.CallbackContext ctx)
+    private void OnMoveInput(InputAction.CallbackContext context)
     {
-        MovementInput = ctx.ReadValue<Vector2>();
+        MovementInput = context.ReadValue<Vector2>();
     }
 
+
+    
     private void ApplyMovement()
     {
         float horizontal = Mathf.Clamp(MovementInput.x, -1, 1);
