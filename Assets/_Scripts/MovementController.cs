@@ -15,14 +15,14 @@ public class MovementController : MonoBehaviour
     [SerializeField] private Collider footCollider;
     [SerializeField] private float platformSnapOffset = 0.01f;
 
-    private Vector2 MovementInput { get; set; } = Vector2.zero;
-    private MovementMode movementMode = MovementMode.Platform;
+    protected Vector2 MovementInput = Vector2.zero;
+    protected MovementMode movementMode = MovementMode.Platform;
 
     private Collider currentPlatform;
-    private HashSet<Collider> ladders = new HashSet<Collider>();
+    protected HashSet<Collider> ladders = new HashSet<Collider>();
     private float laddersX;
     
-    private InputSystem_Actions inputActions;
+    //private InputSystem_Actions inputActions;
     
     private float halfHeight = -1;
     
@@ -31,10 +31,10 @@ public class MovementController : MonoBehaviour
     
     private void Awake()
     {
-        InitializePlayerInput();
+        //InitializePlayerInput();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         ApplyMovement();
     }
@@ -46,6 +46,7 @@ public class MovementController : MonoBehaviour
             halfHeight = transform.position.y - footCollider.bounds.min.y;
     }
 
+    /*
     private void OnDestroy()
     {
         inputActions?.Dispose();
@@ -58,21 +59,29 @@ public class MovementController : MonoBehaviour
         inputActions.Player.Move.canceled += OnMoveInput;
         inputActions.Enable();
     }
+    
 
     private void OnMoveInput(InputAction.CallbackContext context)
     {
         MovementInput = context.ReadValue<Vector2>();
     }
-
-
+    */
+    
+    public void SetMovementInput(Vector2 input)
+    {
+        MovementInput = Vector2.ClampMagnitude(input, 1f);
+    }
     
     private void ApplyMovement()
     {
         float horizontal = Mathf.Clamp(MovementInput.x, -1, 1);
         float vertical = Mathf.Clamp(MovementInput.y, -1, 1);
 
+        Debug.Log("horizontal " + horizontal + " vertical " + vertical);
+        
         Vector3 position = transform.position;
 
+        Debug.Log("movementMode " + movementMode);
         switch (movementMode)
         {
             case MovementMode.Platform:
@@ -90,8 +99,11 @@ public class MovementController : MonoBehaviour
     private Vector3 MoveOnPlatform(Vector3 position, float horizontal, float vertical)
     {
         if (currentPlatform == null)
+        {
+            Debug.Log("No current platform, cannot move");
             return position;
-        
+        }
+
         position.x += horizontal * horizontalSpeed * Time.deltaTime;
         position = ClampToPlatformX(position);
         position = SnapToPlatformY(position);
@@ -175,11 +187,13 @@ public class MovementController : MonoBehaviour
     {
         if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
+            Debug.Log("Platform entered " + other.name);
             currentPlatform = other;
         }
         
         if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
         {
+            Debug.Log("Ladder entered " + other.name);
             ladders.Add(other);
             // TODO: work on it
             laddersX = other.transform.position.x;
@@ -190,22 +204,14 @@ public class MovementController : MonoBehaviour
     {
         if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
+            Debug.Log("Platform exited " + other.name);
             currentPlatform = null;
         }
         
         if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
         {
+            Debug.Log("Ladder exited " + other.name);
             ladders.Remove(other);
         }
-    }
-    
-    private bool IsLadderOnCurrentFace(Collider ladder)
-    {
-        Vector3 toPlayer = (transform.position - transform.position).normalized;
-        Vector3 toLadder = (transform.position - ladder.transform.position).normalized;
-
-        float dot = Vector3.Dot(toPlayer, toLadder);
-
-        return dot > 0.7f;
     }
 }

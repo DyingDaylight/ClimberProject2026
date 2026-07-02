@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5337704693874643739}
   - component: {fileID: 5180457830860883651}
   - component: {fileID: 1365149629465330748}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LadderPrefab
   m_TagString: Stairs
   m_Icon: {fileID: 0}
@@ -83,6 +83,10 @@ PrefabInstance:
     - target: {fileID: 7317150177357414829, guid: 55950e8fd9760f0488b64073fdf74021, type: 3}
       propertyPath: m_Name
       value: Stairs_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 7317150177357414829, guid: 55950e8fd9760f0488b64073fdf74021, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7317150177357414829, guid: 55950e8fd9760f0488b64073fdf74021, type: 3}
       propertyPath: m_TagString
