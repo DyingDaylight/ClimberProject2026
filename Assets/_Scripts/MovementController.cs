@@ -14,25 +14,31 @@ public class MovementController : MonoBehaviour
     [Header("Colliders")]
     [SerializeField] private Collider footCollider;
     [SerializeField] private float platformSnapOffset = 0.01f;
+    
+    [Header("Ladder Alignment")]
+    [SerializeField] private float ladderAlignSpeed = 3f;
+    [SerializeField] private float ladderAlignThreshold = 0.03f;
 
     protected Vector2 MovementInput = Vector2.zero;
     protected MovementMode movementMode = MovementMode.Platform;
 
     private Collider currentPlatform;
-    protected HashSet<Collider> ladders = new HashSet<Collider>();
-    private float laddersX;
     
-    //private InputSystem_Actions inputActions;
+    protected HashSet<Collider> ladders = new HashSet<Collider>();
+    protected Collider currentLadderCollider;
+    protected LadderSegmentInfo currentLadderInfo;
+    protected LadderSegmentInfo.LadderSegmentType? lastExitedLadderType;
     
     private float halfHeight = -1;
+
+    public TowerTier CurrentTier { get; private set; }
+
+    public bool IsOnLadder => currentLadderCollider != null;
+    public LadderSegmentInfo CurrentLadderInfo => currentLadderInfo;
+    public LadderSegmentInfo.LadderSegmentType? LastExitedLadderType => lastExitedLadderType;
     
     private bool HasPlatform => currentPlatform != null;
-    
-    
-    private void Awake()
-    {
-        //InitializePlayerInput();
-    }
+
 
     protected virtual void Update()
     {
@@ -41,35 +47,24 @@ public class MovementController : MonoBehaviour
     
     private void FixedUpdate()
     {
-        // Count hight of the player and save it for later use in updates
-        if (halfHeight < 0)
+        // Count height of the player and save it for later use in updates
+        if (halfHeight < 0 && footCollider != null)
             halfHeight = transform.position.y - footCollider.bounds.min.y;
     }
-
-    /*
-    private void OnDestroy()
-    {
-        inputActions?.Dispose();
-    }
-
-    private void InitializePlayerInput()
-    {
-        inputActions = new InputSystem_Actions();
-        inputActions.Player.Move.performed += OnMoveInput;
-        inputActions.Player.Move.canceled += OnMoveInput;
-        inputActions.Enable();
-    }
-    
-
-    private void OnMoveInput(InputAction.CallbackContext context)
-    {
-        MovementInput = context.ReadValue<Vector2>();
-    }
-    */
     
     public void SetMovementInput(Vector2 input)
     {
         MovementInput = Vector2.ClampMagnitude(input, 1f);
+    }
+
+    public void SetMovementMode(MovementMode mode)
+    {
+        movementMode = mode;
+    }
+    
+    public void ClearLastExitedLadder()
+    {
+        lastExitedLadderType = null;
     }
     
     private void ApplyMovement()
@@ -77,13 +72,14 @@ public class MovementController : MonoBehaviour
         float horizontal = Mathf.Clamp(MovementInput.x, -1, 1);
         float vertical = Mathf.Clamp(MovementInput.y, -1, 1);
 
-        Debug.Log("horizontal " + horizontal + " vertical " + vertical);
-        
         Vector3 position = transform.position;
 
-        Debug.Log("movementMode " + movementMode);
         switch (movementMode)
         {
+            case MovementMode.None:
+                MovementInput = Vector2.zero;
+                return;
+            
             case MovementMode.Platform:
                 position = MoveOnPlatform(position, horizontal, vertical);
                 break;
@@ -107,35 +103,23 @@ public class MovementController : MonoBehaviour
         position.x += horizontal * horizontalSpeed * Time.deltaTime;
         position = ClampToPlatformX(position);
         position = SnapToPlatformY(position);
-        
-        if (Mathf.Abs(vertical) > platformSnapOffset)
-        {
-            if (ladders.Count > 0)
-            {
-                movementMode = MovementMode.Ladder;
-            }
-        }
 
         return position;
     }
     
     private Vector3 MoveOnLadder(Vector3 position, float horizontal, float vertical)
     {
-        if (Mathf.Abs(horizontal) > platformSnapOffset && currentPlatform)
-        {
-            movementMode = MovementMode.Platform;
-
-            position.x += horizontal * horizontalSpeed * Time.deltaTime;
-            position = SnapToPlatformY(position);
-            position = ClampToPlatformX(position);
-            
-            return position;
-        }
-        
-        if (ladders.Count == 0)
+        if (currentLadderCollider == null)
             return position;
         
-        position.x = laddersX;
+        float targetX = currentLadderCollider.transform.position.x;
+        position.x = Mathf.MoveTowards(position.x, targetX, ladderAlignSpeed * Time.deltaTime);
+        bool alignedToLadder = Mathf.Abs(position.x - targetX) <= ladderAlignThreshold;
+        
+        if (!alignedToLadder)
+            return position;
+        
+        position.x = targetX;
         position.y += vertical * verticalSpeed * Time.deltaTime;
         
         return position;
@@ -147,7 +131,6 @@ public class MovementController : MonoBehaviour
             return position;
 
         position.y = currentPlatform.bounds.max.y + halfHeight - platformSnapOffset;
-        
         return position;
     }
 
@@ -163,7 +146,6 @@ public class MovementController : MonoBehaviour
         float rightBound = platformBounds.max.x - playerHalfWidth;
         
         position.x = Mathf.Clamp(position.x, leftBound, rightBound);
-        
         return position;
     }
     
@@ -187,16 +169,18 @@ public class MovementController : MonoBehaviour
     {
         if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
-            Debug.Log("Platform entered " + other.name);
             currentPlatform = other;
+            CurrentTier = other.GetComponentInParent<TowerTier>();
         }
         
         if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
         {
-            Debug.Log("Ladder entered " + other.name);
             ladders.Add(other);
-            // TODO: work on it
-            laddersX = other.transform.position.x;
+            
+            currentLadderCollider = other;
+            currentLadderInfo = other.GetComponentInParent<LadderSegmentInfo>();
+            
+            lastExitedLadderType = null;
         }
     }
     
@@ -204,14 +188,24 @@ public class MovementController : MonoBehaviour
     {
         if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
-            Debug.Log("Platform exited " + other.name);
-            currentPlatform = null;
+            if (currentPlatform == other)
+                currentPlatform = null;
         }
         
         if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))
         {
-            Debug.Log("Ladder exited " + other.name);
+            LadderSegmentInfo exitedInfo = other.GetComponentInParent<LadderSegmentInfo>();
+
+            if (exitedInfo != null)
+                lastExitedLadderType = exitedInfo.Type;
+
             ladders.Remove(other);
+
+            if (currentLadderCollider == other)
+            {
+                currentLadderCollider = null;
+                currentLadderInfo = null;
+            }
         }
     }
 }

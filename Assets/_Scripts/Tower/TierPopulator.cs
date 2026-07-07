@@ -29,6 +29,21 @@ public class TierPopulator : MonoBehaviour
             ladder.transform.localRotation = Quaternion.identity;
             ladder.transform.localScale = Vector3.one;
             
+            int slotIndex = i % 3;
+
+            LadderSegmentInfo.LadderSegmentType type = i < 3
+                ? LadderSegmentInfo.LadderSegmentType.Upper
+                : LadderSegmentInfo.LadderSegmentType.Lower;
+
+            LadderSegmentInfo segmentInfo = ladder.GetComponent<LadderSegmentInfo>();
+            if (segmentInfo != null)
+            {
+                segmentInfo.Initialize(type, faceIndex, slotIndex);
+            }
+            else
+            {
+                Debug.LogError("Ladder has no LadderSegmentInfo component");
+            }
             
             Poolable poolable = ladder.GetComponentInChildren<Poolable>();
             if (poolable == null)

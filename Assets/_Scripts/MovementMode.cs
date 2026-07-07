@@ -2,6 +2,7 @@
 {
     public enum MovementMode
     {
+        None,
         Platform,
         Ladder
     }

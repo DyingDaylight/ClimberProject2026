@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5337704693874643739}
   - component: {fileID: 5180457830860883651}
   - component: {fileID: 1365149629465330748}
+  - component: {fileID: 4599041229233998365}
   m_Layer: 7
   m_Name: LadderPrefab
   m_TagString: Stairs
@@ -68,6 +69,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Poolable
   poolTag: Ladder
+--- !u!114 &4599041229233998365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2208506284101802191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3e3097c2015774408b59f50f6a349f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LadderZone
 --- !u!1001 &2091070357222360423
 PrefabInstance:
   m_ObjectHideFlags: 0

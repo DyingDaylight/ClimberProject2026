@@ -78,6 +78,8 @@ public class AdvancedTowerGenerator : BaseTowerGenerator
         {
             OnDifficultyChanged?.Invoke(towerManager.CurrentLevelName);
         }
+
+        TowerTier tier = newTier.GetComponent<TowerTier>();
     }
     
     private LevelParameters GetCurrentLevelParameters()

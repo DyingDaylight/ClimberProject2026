@@ -194,16 +194,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7931f91e2511412d94ff5e7bca0cdeb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Scripts.MovementAIController
-  horizontalSpeed: 1
-  verticalSpeed: 1
+  horizontalSpeed: 0.5
+  verticalSpeed: 0.5
   footCollider: {fileID: 389455964}
   platformSnapOffset: 0.01
-  ladderSearchRadius: 5
+  ladderAlignSpeed: 3
+  ladderAlignThreshold: 0.01
   ladderSearchHalfExtents: {x: 2, y: 0.08, z: 0.5}
   ladderSearchCenterOffset: {x: 0, y: 0.25, z: 0}
   ladderLayer:
     serializedVersion: 2
     m_Bits: 128
+  targetReachThreshold: 0.05
 --- !u!1 &189223866
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,6 +217,7 @@ GameObject:
   - component: {fileID: 189223867}
   - component: {fileID: 189223868}
   - component: {fileID: 189223869}
+  - component: {fileID: 189223870}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -267,6 +270,23 @@ MonoBehaviour:
   mainCamera: {fileID: 330585545}
   tierHeight: 1
   tierPrefab: {fileID: 2371139645042135075, guid: 4513d75467e99944b91ad3d589d828c9, type: 3}
+--- !u!114 &189223870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189223866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90db0373edffac945923778f5b01a700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  playerMovement: {fileID: 23544390}
+  minSwipeDistance: 80
+  playerBodyCollider: {fileID: 1414966906}
+  tierHeight: 1
+  towerRoot: {fileID: 189223867}
 --- !u!1001 &227856450
 PrefabInstance:
   m_ObjectHideFlags: 0
