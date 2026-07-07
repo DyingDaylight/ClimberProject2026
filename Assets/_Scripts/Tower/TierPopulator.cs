@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using _Scripts;
 using _Scripts.Parameters;
 using _Scripts.Poolers;
 using UnityEngine;
@@ -58,7 +59,7 @@ public class TierPopulator : MonoBehaviour
 
     private void TrySpawnCollectables(Transform slot, TierParameters tierParameters)
     {
-        float val = Random.value;
+        float val = GameRandom.Value();
         if (val <= tierParameters.collectableSpawnChance)
         {
             Collectable selected = PickWeighted(tierParameters.collectables);
@@ -98,7 +99,7 @@ public class TierPopulator : MonoBehaviour
         foreach (var collectible in collectables)
             totalWeight += collectible.chance;
 
-        float roll = Random.Range(0f, totalWeight);
+        float roll = GameRandom.Range(0f, totalWeight);
 
         foreach (var collectible in collectables)
         {

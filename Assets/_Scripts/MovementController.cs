@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using _Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +14,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float verticalSpeed = 1f;
 
     [Header("Colliders")]
+    [SerializeField] protected Collider bodyCollider;
     [SerializeField] private Collider footCollider;
     [SerializeField] private float platformSnapOffset = 0.01f;
     
@@ -19,6 +22,8 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float ladderAlignSpeed = 3f;
     [SerializeField] private float ladderAlignThreshold = 0.03f;
 
+    [SerializeField] protected Vector3 platformSearchBoxHalfExtents = new Vector3(0.25f, 0.15f, 0.25f);
+    
     protected Vector2 MovementInput = Vector2.zero;
     protected MovementMode movementMode = MovementMode.Platform;
 
@@ -28,9 +33,10 @@ public class MovementController : MonoBehaviour
     protected Collider currentLadderCollider;
     protected LadderSegmentInfo currentLadderInfo;
     protected LadderSegmentInfo.LadderSegmentType? lastExitedLadderType;
-    
-    private float halfHeight = -1;
 
+
+    protected bool isInitialized = false;
+    
     public TowerTier CurrentTier { get; private set; }
 
     public bool IsOnLadder => currentLadderCollider != null;
@@ -40,16 +46,54 @@ public class MovementController : MonoBehaviour
     private bool HasPlatform => currentPlatform != null;
 
 
-    protected virtual void Update()
+    private void Start()
     {
-        ApplyMovement();
+        StartCoroutine(Initialize());
     }
     
-    private void FixedUpdate()
+    private IEnumerator Initialize()
     {
-        // Count height of the player and save it for later use in updates
-        if (halfHeight < 0 && footCollider != null)
-            halfHeight = transform.position.y - footCollider.bounds.min.y;
+        yield return new WaitUntil(TrySnapToPlatformBelow);
+        isInitialized = true;
+    }
+
+    protected bool TrySnapToPlatformBelow()
+    {
+        Collider[] hits = Physics.OverlapBox(
+            transform.position,
+            platformSearchBoxHalfExtents,
+            Quaternion.identity,
+            LayerMask.GetMask("Platform")
+        );
+
+        if (hits.Length == 0)
+            return false;
+
+        Collider bestCollider = null;
+        float highestTopY = float.MinValue;
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.bounds.max.y > highestTopY)
+            {
+                highestTopY = hit.bounds.max.y;
+                bestCollider = hit;
+            }
+        }
+
+        currentPlatform = bestCollider;
+
+        transform.position = SnapToPlatformY(transform.position);
+
+        return true;
+    }
+
+    protected virtual void Update()
+    {
+        if (!isInitialized)
+            return;
+        
+        ApplyMovement();
     }
     
     public void SetMovementInput(Vector2 input)
@@ -77,7 +121,7 @@ public class MovementController : MonoBehaviour
         switch (movementMode)
         {
             case MovementMode.None:
-                MovementInput = Vector2.zero;
+                SetMovementInput(Vector2.zero);
                 return;
             
             case MovementMode.Platform:
@@ -127,10 +171,10 @@ public class MovementController : MonoBehaviour
 
     private Vector3 SnapToPlatformY(Vector3 position)
     {
-        if (!HasPlatform || footCollider == null || halfHeight < 0)
+        if (!HasPlatform || footCollider == null)
             return position;
-
-        position.y = currentPlatform.bounds.max.y + halfHeight - platformSnapOffset;
+        
+        position.y = currentPlatform.bounds.max.y - platformSnapOffset;
         return position;
     }
 
@@ -189,7 +233,10 @@ public class MovementController : MonoBehaviour
         if (colliderType == PlayerColliderType.Feet && other.CompareTag("Platform"))
         {
             if (currentPlatform == other)
-                currentPlatform = null;
+            {
+                //currentPlatform = null;
+            }
+
         }
         
         if (colliderType == PlayerColliderType.Body && other.CompareTag("Stairs"))

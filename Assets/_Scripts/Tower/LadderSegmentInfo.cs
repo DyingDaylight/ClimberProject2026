@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class LadderSegmentInfo : MonoBehaviour
 {
+
     public enum LadderSegmentType
     {
         Upper,

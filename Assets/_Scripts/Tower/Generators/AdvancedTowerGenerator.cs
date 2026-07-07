@@ -1,10 +1,10 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using _Scripts;
 using _Scripts.Parameters;
 using _Scripts.Poolers;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class SaveGameInfo
 {
@@ -112,7 +112,7 @@ public class AdvancedTowerGenerator : BaseTowerGenerator
         {
             for (int i = 0; i < upperLaddersOnFaces[face].Length; i++)
             {
-                upperLaddersOnFaces[face][i] = Random.value > 0.5f;
+                upperLaddersOnFaces[face][i] = GameRandom.Value() > 0.5f;
             }
             isFirstSegment = false;
         }
@@ -125,7 +125,7 @@ public class AdvancedTowerGenerator : BaseTowerGenerator
         var tierParameters = GetCurrentTierParameters();
         int minLadders = tierParameters?.minLadder ?? 1;
         int maxLadders = tierParameters?.maxLadder ?? 3;
-        int numLaddersToPlace = Random.Range(minLadders, maxLadders + 1);
+        int numLaddersToPlace = GameRandom.Range(minLadders, maxLadders + 1);
 
         for (int i = 0; i < 3; i++)
         {
@@ -138,7 +138,7 @@ public class AdvancedTowerGenerator : BaseTowerGenerator
             int randomIndex;
             do
             {
-                randomIndex = Random.Range(0, 3);
+                randomIndex = GameRandom.Range(0, 3);
             } while (slots[randomIndex]);
             
             slots[randomIndex] = true;

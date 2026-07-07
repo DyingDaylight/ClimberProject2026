@@ -17,10 +17,16 @@ namespace _Scripts
         [Header("AI")]
         [SerializeField] private Vector3 ladderSearchHalfExtents = new Vector3(5f, 0.1f, 1f);
         [SerializeField] private Vector3 ladderSearchCenterOffset = new Vector3(0f, 0.6f, 0f);
+        [SerializeField] private Vector3 ladderVertSearchHalfExtents = new Vector3(0.1f, 5f, 1f);
         [SerializeField] private LayerMask ladderLayer;
         
         [Header("AI Movement")]
         [SerializeField] private float targetReachThreshold = 0.05f;
+        [SerializeField] private float nextTierMinYAboveHead = 0.05f;
+        [SerializeField] private float nextTierMaxYAboveHead = 1.5f;
+        [SerializeField] private float ladderConnectionXThreshold = 0.1f;
+        [SerializeField] private float ladderConnectionZThreshold = 0.1f;
+        
         
         private AIState state = AIState.SearchLadder;
         private Transform targetLadder;
@@ -31,10 +37,24 @@ namespace _Scripts
             Gizmos.color = Color.cyan;
             Vector3 center = transform.position + ladderSearchCenterOffset;
             Gizmos.DrawWireCube(center, ladderSearchHalfExtents * 2f);
+            
+            Gizmos.color = Color.chocolate;
+            Vector3 center2 = new Vector3(
+                bodyCollider.bounds.center.x,
+                bodyCollider.bounds.center.y + ladderVertSearchHalfExtents.y,
+                bodyCollider.bounds.center.z);
+            Gizmos.DrawWireCube(center2, ladderVertSearchHalfExtents * 2f);
+
+            
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(transform.position, platformSearchBoxHalfExtents * 2f);
         }
 
         protected override void Update()
         {
+            if (!isInitialized)
+                return;
+            
             UpdateState();
             base.Update();
         }
@@ -74,25 +94,19 @@ namespace _Scripts
 
         private void UpdateMoveToLadder()
         {
-            if (IsOnLadder)
-            {
-                targetLadder = null;
-                state = AIState.ClimbLadder;
-                return;
-            }
-
             if (targetLadder == null)
             {
                 state = AIState.SearchLadder;
                 return;
             }
-                
+            
             SetMovementMode(MovementMode.Platform);
-
+            
             float xDifference = targetLadder.position.x - transform.position.x;
             if (Mathf.Abs(xDifference) < targetReachThreshold)
             {
                 SetMovementInput(Vector2.zero);
+                state = AIState.ClimbLadder;
                 return;
             }
             
@@ -104,37 +118,45 @@ namespace _Scripts
             SetMovementMode(MovementMode.Ladder);
             SetMovementInput(new Vector2(0f, 1f));
 
-            if (IsOnLadder)
-                return;
-
-            LadderSegmentInfo.LadderSegmentType? exitedType = LastExitedLadderType;
-            ClearLastExitedLadder();
-
-            targetLadder = null;
-
-            if (exitedType == LadderSegmentInfo.LadderSegmentType.Upper)
+            if (IsOnLadder 
+                && currentLadderInfo != null 
+                && currentLadderInfo.Type == LadderSegmentInfo.LadderSegmentType.Upper 
+                && IsHeadNearTopOfCurrentLadder()
+                && !HasConnectedLowerLadderAboveHead())
             {
                 state = AIState.WaitForUpperAlignment;
                 return;
             }
-
-            state = AIState.MoveToLadder;
-        }
-
-        private void UpdateWaitForUpperAlignment()
-        {
-            SetMovementMode(MovementMode.None);
-            SetMovementInput(Vector2.zero);
-
-            Transform ladderInFront  = GetLadderInFront();
-
-            if (ladderInFront == null)
+            
+            if (IsOnLadder)
                 return;
 
-            targetLadder = ladderInFront;
+            targetLadder = null;
+            
+            if (TrySnapToPlatformBelow())
+            {
+                state = AIState.SearchLadder;
+                return;
+            }
+            
+            SetMovementMode(MovementMode.None);
+            SetMovementInput(Vector2.zero);
+        }
+        
+        private void UpdateWaitForUpperAlignment()
+        {
+            SetMovementMode(MovementMode.Ladder);
+            SetMovementInput(Vector2.zero);
+
+            Transform ladderAbove = GetConnectedLowerLadderAboveHead();
+
+            if (ladderAbove == null)
+                return;
+
+            targetLadder = ladderAbove;
             state = AIState.ClimbLadder;
         }
-
+        
         private Transform GetNearestLadder()
         {
             Collider[] hits = GetVisibleLadders();
@@ -156,27 +178,71 @@ namespace _Scripts
             return nearest;
         }
         
-        private Transform GetLadderInFront()
+        private Transform GetConnectedLowerLadderAboveHead()
         {
-            Collider[] hits = GetVisibleLadders();
+            float bodyUpperY = bodyCollider.bounds.max.y;
+            
+            Collider[] hits = GetVisibleLaddersFromHead(bodyCollider.bounds.max);
 
             foreach (Collider hit in hits)
             {
-                float xDifference = Mathf.Abs(hit.transform.position.x - transform.position.x);
+                if (!hit.TryGetComponent(out LadderSegmentInfo ladderInfo))
+                    continue;
 
-                if (xDifference <= targetReachThreshold)
-                    return hit.transform;
+                if (ladderInfo.Type != LadderSegmentInfo.LadderSegmentType.Lower)
+                    continue;
+
+                float yDifference = hit.transform.position.y - bodyUpperY;
+
+                if (yDifference < nextTierMinYAboveHead)
+                    continue;
+
+                if (yDifference > nextTierMaxYAboveHead)
+                    continue;
+
+                float xDifference = Mathf.Abs(hit.transform.position.x - transform.position.x);
+                float ZDifference = Mathf.Abs(hit.transform.position.z - transform.position.z);
+
+                if (xDifference > ladderConnectionXThreshold || ZDifference > ladderConnectionZThreshold)
+                    continue;
+
+                return hit.transform;
             }
 
             return null;
+        }
+        
+        private bool HasConnectedLowerLadderAboveHead()
+        {
+            return GetConnectedLowerLadderAboveHead() != null;
+        }
+        
+        private Collider[] GetVisibleLaddersFromHead(Vector3 headPosition)
+        {
+            Vector3 center = new Vector3(
+                bodyCollider.bounds.center.x,
+                bodyCollider.bounds.center.y + ladderVertSearchHalfExtents.y,
+                bodyCollider.bounds.center.z);
+
+            return Physics.OverlapBox(center, ladderSearchHalfExtents, Quaternion.identity, ladderLayer);
         }
 
         private Collider[] GetVisibleLadders()
         {
             Vector3 center = transform.position + ladderSearchCenterOffset;
             
-            return Physics.OverlapBox(center, ladderSearchHalfExtents,
-                Quaternion.identity, ladderLayer);
+            return Physics.OverlapBox(center, ladderSearchHalfExtents, Quaternion.identity, ladderLayer);
+        }
+        
+        private bool IsHeadNearTopOfCurrentLadder()
+        {
+            if (currentLadderCollider == null)
+                return false;
+
+            float headY = bodyCollider.bounds.max.y + 0.1f;
+            float ladderTopY = currentLadderCollider.bounds.max.y;
+
+            return headY >= ladderTopY;
         }
         
         public void ResetTarget()

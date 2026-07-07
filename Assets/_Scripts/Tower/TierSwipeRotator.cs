@@ -48,16 +48,9 @@ public class TierSwipeRotator : MonoBehaviour
 
         TowerTier tierToRotate = GetTierAbovePlayer();
         
-        // TODO: tier to rotate is null!
-        if (tierToRotate == null)
-        {
-            Debug.Log("tierToRotate.IsRotating " + tierToRotate.IsRotating);
-        }
-
         if (tierToRotate.IsRotating)
             return;
 
-        Debug.Log("swiped");
         StartCoroutine(RotateTierSafely(tierToRotate, direction));
     }
 
@@ -65,20 +58,16 @@ public class TierSwipeRotator : MonoBehaviour
     {
         isBusy = true;
         
-        Debug.Log("Rotation started");
-
         tier.RotateQuarter(direction);
 
         yield return new WaitUntil(() => !tier.IsRotating);
 
         isBusy = false;
-        
-        Debug.Log("Rotation ended");
     }
     
     private TowerTier GetTierAbovePlayer()
     {
-        float playerHeadY = playerBodyCollider.bounds.max.y;
+        float playerHeadY = playerBodyCollider.bounds.max.y - 0.05f;
 
         TowerTier bestTier = null;
         float bestBottomY = float.MaxValue;
@@ -92,7 +81,7 @@ public class TierSwipeRotator : MonoBehaviour
 
             float candidateBottomY = candidate.transform.position.y - tierHeight * 0.5f;
 
-            if (candidateBottomY <= playerHeadY  + 0.01f)
+            if (candidateBottomY <= playerHeadY)
                 continue;
 
             if (candidateBottomY < bestBottomY)
@@ -102,9 +91,6 @@ public class TierSwipeRotator : MonoBehaviour
             }
         }
 
-        Debug.Log($"Player position: {playerMovement.name}, y={playerMovement.transform.position.y}");
-        Debug.Log($"Tier above: {bestTier?.name}, y={bestTier?.transform.position.y}");
-        
         return bestTier;
     }
 }

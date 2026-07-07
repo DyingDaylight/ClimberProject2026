@@ -159,13 +159,11 @@ public class PlayerControl : MonoBehaviour
 
 
         transform.position = position;
-        Debug.Log("Entered ladder mode");
     }
 
     private void ExitLadderMode()
     {
         isOnLadder = false;
-        Debug.Log("exit ladder mode");
         movementMode = MovementMode.Platform;
         // Snap immediately to platform
         Vector3 position = transform.position;

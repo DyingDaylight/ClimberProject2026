@@ -14,11 +14,7 @@ namespace _Scripts.Parameters
         private int tiersGenerated = 0;
         
         public string CurrentLevelName => CurrentLevelParameters?.levelName ?? "Unknown";
-
-        private void Awake()
-        {
-            Debug.Log("Awake: " + currentLevelIndex);
-        }
+        
 
         public TierParameters CurrentTierParameters => 
             levelParameters.Count > 0 && currentLevelIndex < levelParameters.Count 

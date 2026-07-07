@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using _Scripts;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
@@ -7,6 +8,7 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
+        GameRandom.SetSeed(101);
         scoreState.ResetScore();
     }
 }

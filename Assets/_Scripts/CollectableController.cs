@@ -9,12 +9,9 @@ public class CollectableController : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("OnTriggerEnter "  + other.gameObject.name + other.gameObject.tag);
         if (other.GetComponentInParent<MovementController>() == null)
             return;
 
-        Debug.Log(gameObject.name + " collected " + scoreValue);
-        
         scoreState.Add(scoreValue);
 
         if (pickupAudio != null)
